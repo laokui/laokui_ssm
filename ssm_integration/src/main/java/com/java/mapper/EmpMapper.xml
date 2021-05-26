@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.java.mapper.EmpMapper">
+
+   <select id="selectEmp" resultType="Map">
+        SELECT * FROM emp
+    </select>
+
+    <!--批量添加 -->
+   <insert id="insertBathEmp" parameterType="java.util.List">
+       INSERT INTO emp (id,empName,salary,profession) VALUES
+       <foreach collection="list"  item="temp"  separator=",">
+           (NULL,#{temp.empName},#{temp.salary},#{temp.profession})
+       </foreach>
+   </insert>
+
+
+    <!--批量删除 -->
+    <delete id="deleteBathEmp" parameterType="list">
+        DELETE FROM emp WHERE id IN
+        <foreach collection="list" item="temp" open="(" close=")" separator=",">
+            #{temp}
+        </foreach>
+    </delete>
+
+
+    <!--动态查询 -->
+    <select id="selectDynamicEmp" parameterType="map" resultType="map">
+        SELECT * FROM emp
+        <where>
+            <if test="empName!=null and empName!=''">
+               and empName=#{empName}
+            </if>
+            <if test="profession!=null and profession!=''">
+               and  profession=#{profession}
+            </if>
+            <if test="salary!=null and salary!=''">
+                and  salary&gt;#{salary}
+            </if>
+        </where>
+    </select>
+
+
+    <!--演示动态添加 -->
+    <insert id="insertDynamic" parameterType="Map">
+       INSERT INTO emp
+       <trim prefix="(" suffix=")" suffixOverrides=",">
+           <if test="empName!=null and empName!=''">
+               empName,
+           </if>
+           <if test="salary!=null and salary!=''">
+               salary,
+           </if>
+           <if test="profession!=null and profession!=''">
+               profession
+           </if>
+       </trim>
+         VALUES
+         <trim prefix="(" suffix=")" suffixOverrides=",">
+             <if test="empName!=null and empName!=''">
+                 #{empName},
+             </if>
+             <if test="salary!=null and salary!=''">
+                 #{salary},
+             </if>
+             <if test="profession!=null and profession!=''">
+                 #{profession}
+             </if>
+         </trim>
+    </insert>
+
+
+
+</mapper>
